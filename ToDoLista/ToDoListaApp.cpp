@@ -12,29 +12,29 @@
 #endif
 
 
-// CToDoListaAppApp
+// CToDoListaApp
 
-BEGIN_MESSAGE_MAP(CToDoListaAppApp, CWinApp)
+BEGIN_MESSAGE_MAP(CToDoListaApp, CWinApp)
 	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
 END_MESSAGE_MAP()
 
 
-// CToDoListaAppApp construction
+// CToDoListaApp construction
 
-CToDoListaAppApp::CToDoListaAppApp()
+CToDoListaApp::CToDoListaApp()
 {
 	// Place all significant initialization in InitInstance
 }
 
 
-// The one and only CToDoListaAppApp object
+// The one and only CToDoListaApp object
 
-CToDoListaAppApp theApp;
+CToDoListaApp theApp;
 
 
-// CToDoListaAppApp initialization
+// CToDoListaApp initialization
 
-BOOL CToDoListaAppApp::InitInstance()
+BOOL CToDoListaApp::InitInstance()
 {
 	// InitCommonControlsEx() is required on Windows XP if an application
 	// manifest specifies use of ComCtl32.dll version 6 or later to enable
@@ -53,7 +53,7 @@ BOOL CToDoListaAppApp::InitInstance()
 
 	// Create the shell manager, in case the dialog contains
 	// any shell tree view or shell list view controls.
-	CShellManager *pShellManager = new CShellManager;
+	CShellManager* pShellManager = new CShellManager;
 
 	// Activate "Windows Native" visual manager for enabling themes in MFC controls
 	CMFCVisualManager::SetDefaultManager(RUNTIME_CLASS(CMFCVisualManagerWindows));
@@ -98,10 +98,8 @@ BOOL CToDoListaAppApp::InitInstance()
 	return FALSE;
 }
 
-CDatabase* CToDoListaAppApp::Connect()
+BOOL CToDoListaApp::Connect(CDatabase& database)
 {
-	CDatabase* pDatabase = new CDatabase();
-
 	CString sDriver = L"MICROSOFT ACCESS DRIVER (*.mdb)";
 	CString sDsn = L"";
 	CString sFile = L"..\\Zadatci.mdb";
@@ -109,19 +107,5 @@ CDatabase* CToDoListaAppApp::Connect()
 	sDsn.Format(L"ODBC;DRIVER={%s};DSN='';DBQ=%s", sDriver, sFile);
 
 	// Open the database
-	if (pDatabase->Open(NULL, false, false, sDsn) == TRUE)
-	{
-		return pDatabase;
-	}
-	else
-	{
-		delete pDatabase;
-		return NULL;
-	}
-}
-
-void CToDoListaAppApp::Disconnect(CDatabase* pDatabase)
-{
-	pDatabase->Close();
-	delete pDatabase;
+	return database.Open(NULL, false, false, sDsn);
 }

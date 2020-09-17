@@ -22,12 +22,12 @@ class CAboutDlg : public CDialogEx
 public:
 	CAboutDlg();
 
-// Dialog Data
+	// Dialog Data
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_ABOUTBOX };
 #endif
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 
 // Implementation
@@ -45,7 +45,7 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
-	
+
 END_MESSAGE_MAP()
 
 
@@ -71,7 +71,7 @@ void CToDoListaDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_DATETIMEPICKER_TIME_FILTER_TO, m_FilterToTime);
 
 	DDX_Control(pDX, IDC_EDIT_PRIO, m_FilterPrio);
-	
+
 }
 
 BEGIN_MESSAGE_MAP(CToDoListaDlg, CDialogEx)
@@ -135,11 +135,11 @@ BOOL CToDoListaDlg::OnInitDialog()
 	m_ListControl.InsertColumn(0, L"Vrijeme", LVCFMT_CENTER, -1, 0);
 	m_ListControl.InsertColumn(1, L"Prioritet", LVCFMT_CENTER, -1, 0);
 	m_ListControl.InsertColumn(2, L"Opis Zadatka", LVCFMT_CENTER, -1, 0);
-	
+
 	m_ListControl.SetColumnWidth(0, 120);
 	m_ListControl.SetColumnWidth(1, 50);
 	m_ListControl.SetColumnWidth(2, 280);
-	
+
 	Fill();
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -202,14 +202,13 @@ void CToDoListaDlg::ClearList()
 
 void CToDoListaDlg::Fill()
 {
-	CDatabase* pDatabase = CToDoListaAppApp::Connect();
-
-	if (pDatabase == NULL) return;
+	CDatabase database;
+	if (theApp.Connect(database) == FALSE) return;
 
 	CString SqlString;
 	CString sID, sVrijemeDO, sOpis, sPrio;
 
-	CRecordset recset(pDatabase);
+	CRecordset recset(&database);
 
 	if (m_FilterOffOn.GetCheck() == BST_UNCHECKED)
 	{
@@ -229,7 +228,7 @@ void CToDoListaDlg::Fill()
 
 		dateFrom = COleDateTime::COleDateTime(dateFrom.GetYear(), dateFrom.GetMonth(), dateFrom.GetDay(),
 			timeFrom.GetHour(), timeFrom.GetMinute(), timeFrom.GetSecond()
-			);
+		);
 		dateTo = COleDateTime::COleDateTime(dateTo.GetYear(), dateTo.GetMonth(), dateTo.GetDay(),
 			timeTo.GetHour(), timeTo.GetMinute(), timeTo.GetSecond()
 		);
@@ -242,7 +241,7 @@ void CToDoListaDlg::Fill()
 		CString b = dateTo.Format(L"%D %T");
 		SqlString += b;
 		SqlString += L"#";
-		CString c=L"";
+		CString c = L"";
 		m_FilterPrio.GetWindowText(c);
 		if (c != "")
 		{
@@ -266,7 +265,7 @@ void CToDoListaDlg::Fill()
 		recset.GetFieldValue(L"Prioritet", sPrio);
 
 		COleDateTime oledt = COleDateTime::COleDateTime(dt.m_pdate->year, dt.m_pdate->month, dt.m_pdate->day, dt.m_pdate->hour, dt.m_pdate->minute, dt.m_pdate->second);
-			
+
 		sVrijemeDO = oledt.Format(L"%e.%m.%Y. %X");
 		sVrijemeDO.Replace(L".0", L".");
 		sOpis.Replace(L"\r", L" ");
@@ -277,8 +276,6 @@ void CToDoListaDlg::Fill()
 
 		recset.MoveNext();
 	}
-
-	CToDoListaAppApp::Disconnect(pDatabase);
 }
 
 
@@ -347,10 +344,8 @@ void CToDoListaDlg::OnBnClickedButtonDelete()
 	int row = m_ListControl.GetSelectionMark();
 	if (row < 0) return;
 
-
-	CDatabase* pDatabase = CToDoListaAppApp::Connect();
-	
-	if (pDatabase == NULL) return;
+	CDatabase database;
+	if (theApp.Connect(database) == FALSE) return;
 
 	CString SqlString;
 
@@ -368,11 +363,12 @@ void CToDoListaDlg::OnBnClickedButtonDelete()
 			strID.Format(L"%d", id);
 			SqlString = "DELETE FROM Zadatci where ID=";
 			SqlString += strID;
-			pDatabase->ExecuteSQL(SqlString);
+			database.ExecuteSQL(SqlString);
 		}
 	}
 
-	CToDoListaAppApp::Disconnect(pDatabase);
+	//must close...if not...Fill() will give wrong output
+	database.Close();
 
 	Fill();
 }

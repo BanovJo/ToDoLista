@@ -86,7 +86,7 @@ BOOL EditDlg::OnInitDialog()
 		Fill(ID);
 	}
 
-	
+
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
 
@@ -133,9 +133,8 @@ HCURSOR EditDlg::OnQueryDragIcon()
 
 void EditDlg::OnBnClickedOk()
 {
-	CDatabase* pDatabase = CToDoListaAppApp::Connect();
-
-	if (pDatabase == NULL) return;
+	CDatabase database;
+	if (theApp.Connect(database) == FALSE) return;
 
 	CString SqlString;
 
@@ -162,12 +161,12 @@ void EditDlg::OnBnClickedOk()
 		SqlString += "' ";
 		SqlString += " WHERE ID=";
 		SqlString += ID;
-		pDatabase->ExecuteSQL(SqlString);
+		database.ExecuteSQL(SqlString);
 	}
 	else
 	{
 		//add
-			
+
 		SqlString = L"INSERT INTO Zadatci(VrijemeDO, OpisZadatka, Prioritet) VALUES(#";
 
 		COleDateTime date, a, b;
@@ -186,10 +185,8 @@ void EditDlg::OnBnClickedOk()
 		m_Prio.GetWindowTextW(out);
 		SqlString += out;
 		SqlString += L"')";
-		pDatabase->ExecuteSQL(SqlString);
+		database.ExecuteSQL(SqlString);
 	}
-
-	CToDoListaAppApp::Disconnect(pDatabase);
 
 	CDialogEx::OnOK();
 }
@@ -203,15 +200,14 @@ void EditDlg::OnBnClickedCancel()
 
 void EditDlg::Fill(CString ID)
 {
-	CDatabase* pDatabase = CToDoListaAppApp::Connect();
-
-	if (pDatabase == NULL) return;
+	CDatabase database;
+	if (theApp.Connect(database) == FALSE) return;
 
 	CString SqlString;
 
 	CString sID, sOpis, sPrio;
 
-	CRecordset recset(pDatabase);
+	CRecordset recset(&database);
 
 	SqlString = L"SELECT ID, VrijemeDO, OpisZadatka, Prioritet FROM Zadatci where ID=";
 	SqlString += ID;
@@ -237,5 +233,4 @@ void EditDlg::Fill(CString ID)
 		break;
 	}
 
-	CToDoListaAppApp::Disconnect(pDatabase);
 }
