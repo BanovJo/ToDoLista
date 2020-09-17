@@ -111,8 +111,8 @@ Sadržaj:
 		- Tekstualni opis zadatka
 		- Tipki Potvrdi za upis novog zadatka ili promjene na zadatku, Odustani za prekid promjene/upisa zadatka.
 	
-	Ukoliko korisnik dvoklikne na neki zadatak s liste, zadatak će se otvoriti za promjenu.
-	Lista zadataka omogućava višestuku selekciju redova.
+	Ukoliko korisnik dvostruko pritisne lijevu tipku miša na nekom zadataku s liste, zadatak će se otvoriti za promjenu.
+	Lista zadataka omogućava višestuko označavanje redova.
 	
 	
 	
